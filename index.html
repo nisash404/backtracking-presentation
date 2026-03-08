@@ -21,7 +21,7 @@
         #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
         /* PROGRESS BAR */
-        #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--success)); z-index: 200; transition: width 0.2s; box-shadow: 0 0 15px var(--primary); }
+        #progress-bar { position: fixed; top: 0; left: 0; height: 8px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--success)); z-index: 200; transition: width 0.2s; box-shadow: 0 0 20px rgba(0,240,255,0.6); }
 
         /* SCANLINE OVERLAY */
         .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
@@ -116,6 +116,23 @@
         .sq-dark { background: #2a2a3a; } .sq-light { background: #3a3a4a; }
         .queen { color: var(--primary); text-shadow: 0 0 15px var(--primary); animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .queen-bad { color: var(--accent); text-shadow: 0 0 20px var(--accent); animation: shake 0.4s; }
+
+        /* MINI MAZE ANIMATION */
+        .mini-maze { display: grid; grid-template-columns: repeat(3, 40px); gap: 4px; margin: 30px auto; width: fit-content; background: var(--surface); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); }
+        .mini-cell { width: 40px; height: 40px; border-radius: 6px; background: #2a2a3a; position: relative; }
+        .mini-path { background: #1a1a28; }
+        .mini-wall { background: #2a2a3a; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); border: 1px solid #334; }
+        .mini-player { position: absolute; top: 10px; left: 10px; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 15px var(--primary); animation: solveMiniMaze 4s infinite cubic-bezier(0.25, 1, 0.5, 1); z-index: 5; }
+        @keyframes solveMiniMaze {
+            0%, 5% { transform: translate(0px, 0px); background: var(--primary); }
+            15% { transform: translate(0px, 44px); background: var(--primary); }
+            30% { transform: translate(44px, 44px); background: var(--accent); box-shadow: 0 0 20px var(--accent); }
+            45% { transform: translate(44px, 44px) scale(0.8); background: var(--danger); box-shadow: 0 0 20px var(--danger); }
+            60% { transform: translate(0px, 44px); background: var(--warning); box-shadow: 0 0 15px var(--warning); }
+            75% { transform: translate(0px, 88px); background: var(--primary); box-shadow: 0 0 15px var(--primary); }
+            85% { transform: translate(88px, 88px); background: var(--success); box-shadow: 0 0 20px var(--success); }
+            100% { transform: translate(88px, 88px); background: var(--success); box-shadow: 0 0 20px var(--success); }
+        }
 
         /* BUTTONS */
         button { background: linear-gradient(135deg, var(--primary), #0088ff); color: #000; border: none; padding: 15px 35px;
@@ -305,6 +322,23 @@
             </ul>
         </div>
     </div>
+    <div class="mini-maze reveal stagger-2">
+        <div class="mini-cell mini-path"><div class="mini-player"></div></div>
+        <div class="mini-cell mini-wall"></div>
+        <div class="mini-cell mini-wall"></div>
+        
+        <div class="mini-cell mini-path"></div>
+        <div class="mini-cell mini-path" style="background: rgba(255,0,127,0.1); border: 1px dotted var(--accent);">
+            <div style="position:absolute; top:8px; left:14px; color:var(--danger); font-size:16px;">✕</div>
+        </div>
+        <div class="mini-cell mini-wall"></div>
+        
+        <div class="mini-cell mini-path"></div>
+        <div class="mini-cell mini-path"></div>
+        <div class="mini-cell mini-path" style="background: rgba(57,255,20,0.1); border: 1px dashed var(--success);">
+            <div style="position:absolute; top:10px; left:12px; color:var(--success); font-size:16px; line-height:1;">★</div>
+        </div>
+    </div>
 </section>
 
 <section id="tree-demo">
@@ -359,7 +393,7 @@
     <div class="pruning-visual reveal">
         <div class="tree-box bad">
             <h4>❌ WITHOUT PRUNING</h4>
-            <svg width="220" height="160" viewBox="0 0 220 160">
+            <svg width="150" height="110" viewBox="0 0 220 160">
                 <line x1="110" y1="15" x2="55" y2="55" stroke="#ff003c" stroke-width="2" opacity="0.6"/>
                 <line x1="110" y1="15" x2="165" y2="55" stroke="#ff003c" stroke-width="2" opacity="0.6"/>
                 <line x1="55" y1="55" x2="28" y2="95" stroke="#ff003c" stroke-width="2" opacity="0.6"/>
@@ -394,7 +428,7 @@
         </div>
         <div class="tree-box good">
             <h4>✅ WITH PRUNING</h4>
-            <svg width="220" height="160" viewBox="0 0 220 160">
+            <svg width="150" height="110" viewBox="0 0 220 160">
                 <line x1="110" y1="15" x2="55" y2="55" stroke="#39ff14" stroke-width="2" opacity="0.8"/>
                 <line x1="110" y1="15" x2="165" y2="55" stroke="#333" stroke-width="2" stroke-dasharray="5,5" opacity="0.3"/>
                 <line x1="55" y1="55" x2="28" y2="95" stroke="#333" stroke-width="2" stroke-dasharray="5,5" opacity="0.3"/>
@@ -411,14 +445,6 @@
             </svg>
             <p style="color: var(--success); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-top: 10px;">Explores only 5 nodes 🚀</p>
         </div>
-    </div>
-
-    <div class="complexity-badge reveal" style="margin-top: 30px;">
-        <span style="color: #8888aa;">Time Complexity: </span>
-        <span class="big" style="color: var(--warning);">O(C<sup>S</sup>)</span>
-        <span style="color: #8888aa;"> — Exponential. </span>
-        <span style="color: var(--accent);">Without pruning → useless.</span>
-        <span style="color: var(--success);"> With pruning → magical.</span>
     </div>
 </section>
 
@@ -461,6 +487,13 @@
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.append(move)  <span class="code-highlight-choose">← CHOOSE</span></div>
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-func">solve</span>(path, choices) <span class="code-highlight-explore">← EXPLORE</span></div>
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.pop()         <span class="code-highlight-undo">← UN-CHOOSE</span></div>
+    </div>
+    
+    <div class="complexity-badge reveal" style="margin-top: 40px;">
+        <span style="color: #8888aa;">Time Complexity: </span>
+        <span class="big" style="color: var(--warning);">O(C<sup>S</sup>)</span>
+        <span style="color: #8888aa;"> — Exponential. </span><br>
+        <span style="color: var(--accent); font-size: 1.1rem;">Where C = Choices per step, S = Steps to reach goal</span>
     </div>
 </section>
 
