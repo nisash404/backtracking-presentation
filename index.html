@@ -319,25 +319,27 @@
     <h2 class="glitch reveal" data-text="What is Recursion?">What is Recursion?</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
-        <li>A function that <strong>calls itself</strong> to solve smaller subproblems</li>
-        <li>It only moves <strong>forward</strong> — deeper and deeper</li>
-        <li>If it makes a wrong choice, it has <strong>no way to undo it</strong></li>
+        <li>A function that <strong>calls itself</strong> — like Russian nesting dolls 🪆</li>
+        <li>Each call solves a <strong>smaller version</strong> of the same problem</li>
+        <li>It only moves <strong>forward</strong> — if it makes a wrong choice, it <strong>can't undo it</strong></li>
     </ul>
     <div class="card-container">
         <div class="card warn reveal stagger-1">
             <h3>⚙️ The Base Case</h3>
             <ul class="talk-points">
-                <li>The condition that tells recursion <strong>"you can stop now"</strong></li>
-                <li>Like the smallest <strong>nesting doll</strong> — nothing left to open</li>
-                <li>Without it, recursion <strong>never stops</strong></li>
+                <li>The <strong>"stop" signal</strong> — tells recursion when to quit</li>
+                <li>Like the smallest nesting doll — <strong>nothing left to open</strong></li>
+                <li><em>Example:</em> factorial(1) = 1 → <strong>stop here</strong></li>
+                <li>Without it, recursion <strong>runs forever</strong></li>
             </ul>
         </div>
         <div class="card danger reveal stagger-2">
             <h3>💥 Stack Overflow</h3>
             <ul class="talk-points">
-                <li>Without a base case, the function calls itself <strong>infinitely</strong></li>
-                <li>Each call stacks a new <strong>frame in memory</strong></li>
-                <li>Eventually the stack runs out of space — <strong>crash 💥</strong></li>
+                <li>Every call saves a <strong>snapshot</strong> in memory (a stack frame)</li>
+                <li>Think of it as <strong>stacking plates</strong> — one per call</li>
+                <li>No base case = <strong>infinite plates</strong> = crash 💥</li>
+                <li><em>That's</em> why it's called a <strong>Stack Overflow</strong></li>
             </ul>
         </div>
     </div>
@@ -511,9 +513,10 @@
     <h2 class="glitch reveal" data-text="The 3-Step Formula">The 3-Step Formula</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
-        <li>Every backtracking algorithm follows the <strong>same 3-step pattern</strong></li>
-        <li><strong>Choose</strong> a move, <strong>Explore</strong> it recursively, then <strong>Un-choose</strong> (undo) it</li>
-        <li>This simple loop solves mazes, queens, Sudoku — <strong>everything</strong></li>
+        <li>Every backtracking algorithm follows the <strong>same 3 lines</strong></li>
+        <li><strong>Choose</strong> → commit to a move</li>
+        <li><strong>Explore</strong> → recursively see where it leads</li>
+        <li><strong>Un-choose</strong> → if it failed, <strong>undo</strong> and try the next one</li>
     </ul>
     <div class="code-container code-reveal reveal">
         <div style="height: 12px;"></div>
@@ -522,18 +525,18 @@
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-func">print</span>(path)</div>
         <div class="code-line">&nbsp;</div>
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> move <span class="code-keyword">in</span> choices:</div>
-        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> is_valid(move): <span class="code-comment"># PRUNING (Bridge Out)</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> is_valid(move): <span class="code-comment"># PRUNING (skip bad moves)</span></div>
         <div class="code-line">&nbsp;</div>
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.append(move)  <span class="code-highlight-choose">← CHOOSE</span></div>
         <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-func">solve</span>(path, choices) <span class="code-highlight-explore">← EXPLORE</span></div>
-        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.pop()         <span class="code-highlight-undo">← UN-CHOOSE</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.pop()         <span class="code-highlight-undo">← UN-CHOOSE ⏪</span></div>
     </div>
     
-    <div class="complexity-badge reveal" style="margin-top: 40px;">
+    <div class="complexity-badge reveal" style="margin-top: 20px;">
         <span style="color: #8888aa;">Time Complexity: </span>
         <span class="big" style="color: var(--warning);">O(C<sup>S</sup>)</span>
-        <span style="color: #8888aa;"> — Exponential. </span><br>
-        <span style="color: var(--accent); font-size: 1.1rem;">Where C = Choices per step, S = Steps to reach goal</span>
+        <span style="color: #8888aa;"> — Exponential </span><br>
+        <span style="color: var(--accent); font-size: 1rem;">9<sup>81</sup> for Sudoku ≈ more than atoms in the universe 🤯</span>
     </div>
 </section>
 
