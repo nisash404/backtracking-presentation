@@ -196,6 +196,30 @@
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
         @keyframes popIn { 0% { transform: scale(0) rotate(-10deg); } 80% { transform: scale(1.15) rotate(2deg); } 100% { transform: scale(1) rotate(0); } }
 
+        /* TREE VISUALIZATION */
+        #tree-wrapper { background: var(--surface); padding: 35px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.06);
+            margin-top: 30px; backdrop-filter: blur(10px); display: inline-block; }
+        #tree-svg { display: block; margin: 0 auto; }
+        #tree-svg .tree-edge { stroke: #333; stroke-width: 2.5; transition: stroke 0.4s, opacity 0.4s; }
+        #tree-svg .tree-edge.active { stroke: var(--primary); stroke-width: 3; filter: drop-shadow(0 0 6px rgba(0,240,255,0.5)); }
+        #tree-svg .tree-edge.dead { stroke: var(--accent); opacity: 0.3; stroke-dasharray: 6,4; }
+        #tree-svg .tree-edge.success { stroke: var(--success); stroke-width: 3; filter: drop-shadow(0 0 6px rgba(57,255,20,0.5)); }
+        #tree-svg .tree-node { fill: #2a2a3a; stroke: #444; stroke-width: 2; transition: all 0.4s; cursor: default; }
+        #tree-svg .tree-node.exploring { fill: var(--primary); stroke: var(--primary); filter: drop-shadow(0 0 12px rgba(0,240,255,0.6)); }
+        #tree-svg .tree-node.dead-node { fill: var(--accent); stroke: var(--accent); filter: drop-shadow(0 0 12px rgba(255,0,127,0.5)); }
+        #tree-svg .tree-node.backtracked-node { fill: #1a1a24; stroke: rgba(255,0,127,0.3); stroke-dasharray: 4,3; opacity: 0.5; }
+        #tree-svg .tree-node.found { fill: var(--success); stroke: var(--success); filter: drop-shadow(0 0 15px rgba(57,255,20,0.6)); }
+        #tree-svg .tree-label { fill: #aaa; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+            text-anchor: middle; dominant-baseline: central; transition: fill 0.4s; pointer-events: none; }
+        #tree-svg .tree-label.active-label { fill: #000; }
+        #tree-svg .tree-label.dead-label { fill: rgba(255,255,255,0.4); }
+        .tree-target { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: var(--success); margin: 15px 0;
+            background: rgba(57,255,20,0.1); padding: 8px 20px; border-radius: 8px; display: inline-block; border: 1px solid rgba(57,255,20,0.2); }
+        .tree-log { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #666; margin-top: 15px;
+            min-height: 24px; transition: all 0.3s; }
+        .tree-log .log-explore { color: var(--primary); } .tree-log .log-dead { color: var(--accent); }
+        .tree-log .log-back { color: var(--warning); } .tree-log .log-found { color: var(--success); }
+
         /* SECTION NUMBERS */
         .section-num { font-family: 'Orbitron', sans-serif; font-size: 8rem; font-weight: 900; color: rgba(0,240,255,0.03);
             position: absolute; top: 80px; left: 20px; pointer-events: none; letter-spacing: -5px; }
@@ -228,6 +252,7 @@
 <nav>
     <a href="#intro">Concept</a>
     <a href="#crash">The Crash</a>
+    <a href="#tree-demo">Tree</a>
     <a href="#animation">Maze</a>
     <a href="#pruning">Pruning</a>
     <a href="#queens">Queens</a>
@@ -294,19 +319,30 @@
                 <li>Eventually the stack runs out of space — <strong>crash 💥</strong></li>
             </ul>
         </div>
-        <div class="card danger reveal stagger-3">
-            <h3>☠️ Segmentation Fault</h3>
-            <ul class="talk-points">
-                <li>Even worse — your code tries to access <strong>memory it doesn't own</strong></li>
-                <li>The operating system <strong>kills the program</strong> immediately</li>
-                <li>You see the dreaded: <strong>"Segmentation Fault: Core Dumped"</strong></li>
-            </ul>
-        </div>
+    </div>
+</section>
+
+<section id="tree-demo">
+    <span class="section-num">03</span>
+    <h2 class="glitch reveal" data-text="Backtracking on a Tree">Backtracking on a Tree</h2>
+    <div class="glow-divider reveal"></div>
+    <ul class="talk-points reveal">
+        <li>The algorithm starts at the <strong>root</strong> and explores each branch depth-first</li>
+        <li>If a node isn't the target, it <strong>backtracks</strong> to the parent and tries the next child</li>
+        <li>Dead-end branches are <strong>abandoned</strong> — only the solution path survives</li>
+    </ul>
+    <div id="tree-wrapper" class="reveal from-scale">
+        <div class="tree-target">🎯 Target: <strong><span id="tree-target-val">7</span></strong></div>
+        <svg id="tree-svg" width="520" height="280" viewBox="0 0 520 280"></svg>
+        <div class="tree-log" id="tree-log">Press ▶ to start the search</div>
+        <br>
+        <button id="treeStartBtn" onclick="startTreeSearch()">▶ Search Tree</button>
+        <button id="treeResetBtn" onclick="resetTree()" disabled class="btn-danger">⟲ Reset</button>
     </div>
 </section>
 
 <section id="animation">
-    <span class="section-num">03</span>
+    <span class="section-num">04</span>
     <h2 class="glitch reveal" data-text="The Maze Runner">The Maze Runner</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
@@ -322,7 +358,7 @@
 </section>
 
 <section id="pruning">
-    <span class="section-num">04</span>
+    <span class="section-num">05</span>
     <h2 class="glitch reveal" data-text="How to Cheat: Pruning">How to Cheat: Pruning</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
@@ -417,7 +453,7 @@
 </section>
 
 <section id="queens">
-    <span class="section-num">05</span>
+    <span class="section-num">06</span>
     <h2 class="glitch reveal" data-text="The Boss Fight: 4×4 Queens">The Boss Fight: 4×4 Queens</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
@@ -435,7 +471,7 @@
 </section>
 
 <section id="code">
-    <span class="section-num">06</span>
+    <span class="section-num">07</span>
     <h2 class="glitch reveal" data-text="The 3-Step Formula">The 3-Step Formula</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
@@ -459,7 +495,7 @@
 </section>
 
 <section id="applications">
-    <span class="section-num">07</span>
+    <span class="section-num">08</span>
     <h2 class="glitch reveal" data-text="Real World Applications">Real World Applications</h2>
     <div class="glow-divider reveal"></div>
     <ul class="talk-points reveal">
@@ -499,7 +535,7 @@
 </section>
 
 <section id="thankyou">
-    <span class="section-num">08</span>
+    <span class="section-num">09</span>
     <h1 class="qa-title reveal">Thank You!</h1>
     <div class="glow-divider reveal stagger-1"></div>
     <p class="qa-subtitle reveal stagger-2">Any questions?</p>
@@ -688,6 +724,130 @@ function resetQueens() {
 }
 
 createMaze(); createQueensBoard();
+
+// --- TREE BACKTRACKING DEMO ---
+const treeData = {
+    val: 1, x: 260, y: 35, children: [
+        { val: 2, x: 130, y: 105, children: [
+            { val: 4, x: 65, y: 185, children: [
+                { val: 8, x: 35, y: 255, children: [] },
+                { val: 9, x: 95, y: 255, children: [] }
+            ]},
+            { val: 5, x: 195, y: 185, children: [
+                { val: 10, x: 165, y: 255, children: [] }
+            ]}
+        ]},
+        { val: 3, x: 390, y: 105, children: [
+            { val: 6, x: 325, y: 185, children: [] },
+            { val: 7, x: 455, y: 185, children: [
+                { val: 11, x: 425, y: 255, children: [] },
+                { val: 12, x: 485, y: 255, children: [] }
+            ]}
+        ]}
+    ]
+};
+const TARGET = 7;
+let treeRunning = false;
+const tDelay = 700;
+
+function buildTreeSVG() {
+    const svg = document.getElementById('tree-svg');
+    svg.innerHTML = '';
+    function drawEdges(node) {
+        node.children.forEach(child => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', node.x); line.setAttribute('y1', node.y);
+            line.setAttribute('x2', child.x); line.setAttribute('y2', child.y);
+            line.setAttribute('class', 'tree-edge');
+            line.id = `edge-${node.val}-${child.val}`;
+            svg.appendChild(line);
+            drawEdges(child);
+        });
+    }
+    function drawNodes(node) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', node.x); circle.setAttribute('cy', node.y);
+        circle.setAttribute('r', 20); circle.setAttribute('class', 'tree-node');
+        circle.id = `tnode-${node.val}`;
+        svg.appendChild(circle);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', node.x); text.setAttribute('y', node.y);
+        text.setAttribute('class', 'tree-label'); text.id = `tlabel-${node.val}`;
+        text.textContent = node.val;
+        svg.appendChild(text);
+        node.children.forEach(child => drawNodes(child));
+    }
+    drawEdges(treeData); drawNodes(treeData);
+    document.getElementById('tree-target-val').textContent = TARGET;
+}
+
+function treeLog(msg, cls) {
+    document.getElementById('tree-log').innerHTML = `<span class="${cls}">${msg}</span>`;
+}
+
+async function searchTree(node, parent) {
+    if (!treeRunning) return false;
+    const circle = document.getElementById(`tnode-${node.val}`);
+    const label = document.getElementById(`tlabel-${node.val}`);
+    const edge = parent ? document.getElementById(`edge-${parent.val}-${node.val}`) : null;
+
+    // Explore
+    circle.setAttribute('class', 'tree-node exploring');
+    label.setAttribute('class', 'tree-label active-label');
+    if (edge) edge.setAttribute('class', 'tree-edge active');
+    treeLog(`Exploring node ${node.val}...`, 'log-explore');
+    await wait(tDelay);
+
+    // Found?
+    if (node.val === TARGET) {
+        circle.setAttribute('class', 'tree-node found');
+        label.setAttribute('class', 'tree-label active-label');
+        if (edge) edge.setAttribute('class', 'tree-edge success');
+        treeLog(`✅ Found target ${TARGET} at node ${node.val}!`, 'log-found');
+        return true;
+    }
+
+    // Explore children
+    for (const child of node.children) {
+        if (!treeRunning) return false;
+        if (await searchTree(child, node)) {
+            // Mark this node as part of success path
+            circle.setAttribute('class', 'tree-node found');
+            label.setAttribute('class', 'tree-label active-label');
+            if (edge) edge.setAttribute('class', 'tree-edge success');
+            return true;
+        }
+    }
+
+    // Dead end — backtrack
+    circle.setAttribute('class', 'tree-node dead-node');
+    treeLog(`❌ Dead end at node ${node.val} — backtracking!`, 'log-dead');
+    await wait(tDelay * 0.6);
+    circle.setAttribute('class', 'tree-node backtracked-node');
+    label.setAttribute('class', 'tree-label dead-label');
+    if (edge) edge.setAttribute('class', 'tree-edge dead');
+    treeLog(`↩ Backtracked from node ${node.val}`, 'log-back');
+    await wait(tDelay * 0.4);
+    return false;
+}
+
+async function startTreeSearch() {
+    if (treeRunning) return;
+    resetTree(); treeRunning = true;
+    document.getElementById('treeStartBtn').disabled = true;
+    document.getElementById('treeResetBtn').disabled = false;
+    await searchTree(treeData, null);
+    treeRunning = false;
+}
+
+function resetTree() {
+    treeRunning = false; buildTreeSVG();
+    document.getElementById('tree-log').innerHTML = 'Press ▶ to start the search';
+    document.getElementById('treeStartBtn').disabled = false;
+    document.getElementById('treeResetBtn').disabled = true;
+}
+
+buildTreeSVG();
 
 // --- KEYBOARD NAVIGATION ---
 const allSections = Array.from(document.querySelectorAll('section'));
