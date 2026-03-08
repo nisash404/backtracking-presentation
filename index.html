@@ -322,6 +322,7 @@
         <div class="tree-log" id="tree-log">Press ▶ to start the search</div>
         <br>
         <button id="treeStartBtn" onclick="startTreeSearch()">▶ Search Tree</button>
+        <button id="treeNextBtn" onclick="nextTreeStep()" disabled>⏑ Next (Space)</button>
         <button id="treeResetBtn" onclick="resetTree()" disabled class="btn-danger">⟲ Reset</button>
     </div>
 </section>
@@ -666,7 +667,20 @@ const treeData = {
 };
 const TARGET = 7;
 let treeRunning = false;
-const tDelay = 700;
+let resolveWaitStep = null;
+
+function waitForNextStep() {
+    return new Promise(resolve => {
+        resolveWaitStep = resolve;
+    });
+}
+function nextTreeStep() {
+    if (resolveWaitStep) {
+        let res = resolveWaitStep;
+        resolveWaitStep = null;
+        res();
+    }
+}
 
 function buildTreeSVG() {
     const svg = document.getElementById('tree-svg');
@@ -714,7 +728,7 @@ async function searchTree(node, parent) {
     label.setAttribute('class', 'tree-label active-label');
     if (edge) edge.setAttribute('class', 'tree-edge active');
     treeLog(`Exploring node ${node.val}...`, 'log-explore');
-    await wait(tDelay);
+    await waitForNextStep();
 
     // Found?
     if (node.val === TARGET) {
@@ -740,12 +754,12 @@ async function searchTree(node, parent) {
     // Dead end — backtrack
     circle.setAttribute('class', 'tree-node dead-node');
     treeLog(`❌ Dead end at node ${node.val} — backtracking!`, 'log-dead');
-    await wait(tDelay * 0.6);
+    await waitForNextStep();
     circle.setAttribute('class', 'tree-node backtracked-node');
     label.setAttribute('class', 'tree-label dead-label');
     if (edge) edge.setAttribute('class', 'tree-edge dead');
     treeLog(`↩ Backtracked from node ${node.val}`, 'log-back');
-    await wait(tDelay * 0.4);
+    await waitForNextStep();
     return false;
 }
 
@@ -753,15 +767,22 @@ async function startTreeSearch() {
     if (treeRunning) return;
     resetTree(); treeRunning = true;
     document.getElementById('treeStartBtn').disabled = true;
+    document.getElementById('treeNextBtn').disabled = false;
     document.getElementById('treeResetBtn').disabled = false;
+    treeLog('Started! Press Next Step (Space) to progress.', 'log-explore');
+    await waitForNextStep();
     await searchTree(treeData, null);
     treeRunning = false;
+    document.getElementById('treeNextBtn').disabled = true;
 }
 
 function resetTree() {
-    treeRunning = false; buildTreeSVG();
+    treeRunning = false; 
+    if (resolveWaitStep) { resolveWaitStep(); resolveWaitStep = null; }
+    buildTreeSVG();
     document.getElementById('tree-log').innerHTML = 'Press ▶ to start the search';
     document.getElementById('treeStartBtn').disabled = false;
+    document.getElementById('treeNextBtn').disabled = true;
     document.getElementById('treeResetBtn').disabled = true;
 }
 
@@ -788,6 +809,12 @@ function navigateToSection(idx) {
 }
 
 document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+        if (treeRunning) { e.preventDefault(); nextTreeStep(); return; }
+        // Prevent default spacebar scrolling for the whole page to make navigation smoother 
+        e.preventDefault(); 
+    }
+    
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
         navigateToSection(getCurrentSectionIndex() + 1);
